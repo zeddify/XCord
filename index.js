@@ -105,17 +105,12 @@ client.once("ready", () => {
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
-  if (
-    message.content.includes("x.com") ||
-    message.content.includes("twitter.com")
-  ) {
+  if (message.content.includes("x.com") || message.content.includes("twitter.com")) {
     console.log("A tweet has been sent !");
-    const tweetURL = message.content
-      .split(" ")
-      .find((url) => url.includes("x.com") || url.includes("twitter.com"));
+    const tweetURL = message.content.split(' ').find(url => url.includes('x.com') || url.includes('twitter.com'));
     if (!tweetURL) return;
 
-    const tweetID = tweetURL.split("/").pop().split("?")[0];
+    const tweetID = tweetURL.split('/').pop().split('?')[0];
     try {
       const response = await fetch(`http://localhost:${port}/${tweetID}`);
       const tweetData = await response.json();
@@ -135,13 +130,12 @@ client.on("messageCreate", async (message) => {
         }
       }
 
-      const quotedStatus =
-        tweetData.data.tweetResult.result.quoted_status_result;
+      const quotedStatus = tweetData.data.tweetResult.result.quoted_status_result;
       if (quotedStatus) {
         const quotedTweetText = quotedStatus.result.legacy.full_text;
         if (quotedTweetText) {
           const textWithoutLink = quotedTweetText.split("http")[0].trim();
-          await message.channel.send("Quoted tweet text : " + '" '+textWithoutLink + ' "');
+          await message.channel.send(textWithoutLink);
         }
         const quotedMediaEntities =
           quotedStatus.result.legacy.extended_entities?.media || [];
@@ -165,22 +159,17 @@ client.on("messageCreate", async (message) => {
           if (fileResponse.ok) {
             const arrayBuffer = await fileResponse.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
-            const filename = mediaUrl.split("/").pop();
+            const filename = mediaUrl.split('/').pop();
             const tempFile = tmp.fileSync();
             fs.writeFileSync(tempFile.name, buffer);
-            uploadFiles.push(
-              new AttachmentBuilder(tempFile.name, { name: filename })
-            );
+            uploadFiles.push(new AttachmentBuilder(tempFile.name, { name: filename }));
           } else {
             console.error(`Error downloading the media: ${mediaUrl}`);
           }
         }
 
         if (uploadFiles.length > 0) {
-          await message.channel.send({
-            content: "Tweet media(s) :",
-            files: uploadFiles,
-          });
+          await message.channel.send({ content: "Tweet media(s) :", files: uploadFiles });
         }
       }
     } catch (error) {
