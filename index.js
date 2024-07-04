@@ -135,7 +135,7 @@ client.on("messageCreate", async (message) => {
         const quotedTweetText = quotedStatus.result.legacy.full_text;
         if (quotedTweetText) {
           const textWithoutLink = quotedTweetText.split("http")[0].trim();
-          await message.channel.send(textWithoutLink);
+          await message.channel.send("Quoted tweet text : " +'"' + textWithoutLink + '"');
         }
         const quotedMediaEntities =
           quotedStatus.result.legacy.extended_entities?.media || [];
