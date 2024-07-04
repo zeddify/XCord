@@ -1,0 +1,19 @@
+{
+  "name": "xcord",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "valdoin",
+  "license": "ISC",
+  "description": "XCord monitors messages for Twitter links. When a link is detected, it extracts and shares associated media (photos, videos, GIFs) from the tweet in the same channel.",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "https-proxy-agent": "^7.0.5",
+    "tmp": "^0.2.3"
+  }
+}
