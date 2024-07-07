@@ -14,7 +14,6 @@ Before you begin, ensure you have met the following requirements:
 
 - Node.js installed on your computer.
 - A Discord bot token. You can get one by creating a bot on the [Discord Developer Portal](https://discord.com/developers/applications).
-- PowerShell 3.0 or higher installed on your system (for Windows users).
 
 ## Installation and usage
 
@@ -36,3 +35,5 @@ Before you begin, ensure you have met the following requirements:
         node index.js
 
 5. Invite the bot to your Discord server then send a Twitter URL in any channel and it will fetch and display the tweet medias.
+
+Hosted on [Cybrancee](https://cybrancee.com/).
