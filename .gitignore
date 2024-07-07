@@ -7,4 +7,3 @@ build/
 out/
 package-lock.json
 yarn.lock
-guestToken.txt

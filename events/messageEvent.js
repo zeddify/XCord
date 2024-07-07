@@ -1,7 +1,13 @@
 const { downloadMedia } = require("../utils/downloadMediaUtil.js");
+const { PermissionsBitField } = require('discord.js');
 
 async function handleMessage(message) {
   if (message.author.bot) return;
+
+  if (!message.channel.permissionsFor(message.client.user).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory])) {
+    console.error('Missing SEND_MESSAGES or READ_MESSAGE_HISTORY permission in this channel.');
+    return;
+  }
 
   if (message.content.includes("x.com") || message.content.includes("twitter.com")) {
     console.log("A tweet has been sent !");

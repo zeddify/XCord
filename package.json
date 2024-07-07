@@ -9,6 +9,7 @@
   "license": "MITnp",
   "description": "XCord monitors messages for Twitter links. When a link is detected, it extracts and shares associated media (photos, videos, GIFs) from the tweet in the same channel.",
   "dependencies": {
+    "axios": "^1.7.2",
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",

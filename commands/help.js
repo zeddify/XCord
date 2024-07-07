@@ -3,7 +3,11 @@ module.exports = {
       const helpMessage = `
         # How to use
 
-Simply paste a Twitter URL in any channel, and it will fetch and display the tweet information and media.
+Simply paste a Twitter URL in any channel, and it will fetch and display the tweet information and media.  
+
+**Note : ** If the bot seems to ignore your messages, it might not have sufficient permissions in the channel. The bot needs both **READ MESSAGE HISTORY** and **SEND MESSAGES** permissions to function correctly.  
+
+If you believe the bot should be working but isn't, head to the [support server](https://discord.gg/5YGJvZ2fh3).
       `;
       interaction.reply(helpMessage);
     }

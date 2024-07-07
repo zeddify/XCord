@@ -4,7 +4,7 @@ require("dotenv").config();
 const tweetRoute = require("./router.js");
 const handleMessage = require("./events/messageEvent");
 const helpCommand = require("./commands/help");
-const { unblockFile } = require("./services/guestTokenService.js");
+
 
 // Discord bot intents
 const client = new Client({
@@ -24,7 +24,6 @@ app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
 
-unblockFile();
 
 client.once("ready", async () => {
   console.log(`Logged in as ${client.user.tag}`);

@@ -1,35 +1,23 @@
-const { exec } = require("child_process");
-const fs = require("fs");
+const axios = require("axios");
 
-function execPromise(command) {
-    return new Promise((resolve, reject) => {
-      exec(command, (error, stdout, stderr) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(stdout);
-        }
-      });
-    });
-  }
+async function getGuestToken() {
+  const headers = {
+    Authorization:
+      "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
+  };
 
-  async function unblockFile() {
-    try {
-      await execPromise("powershell Unblock-File -Path ./getGuestToken.ps1");
-    } catch (error) {
-      console.error("Error unblocking the file:", error);
-    }
+  try {
+    const response = await axios.post(
+      "https://api.twitter.com/1.1/guest/activate.json",
+      null,
+      { headers }
+    );
+    const guestToken = response.data.guest_token;
+    console.log("Guest token:", guestToken);
+    return guestToken;
+  } catch (error) {
+    console.error("Error fetching guest token:", error);
   }
-  
-  async function getGuestToken() {
-    try {
-      await execPromise("powershell -File ./getGuestToken.ps1");
-      const token = fs.readFileSync("./guestToken.txt", "utf8");
-      return token.trim().split("\n")[0];
-    } catch (error) {
-      console.error("Error in getGuestToken:", error);
-      return null;
-    }
-  }
+}
 
-module.exports = { getGuestToken, unblockFile };
+module.exports = { getGuestToken };
