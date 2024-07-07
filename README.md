@@ -1,6 +1,6 @@
 # XCord
 
-XCord is a Discord bot that interacts with Twitter. It fetches tweet information and media, and shares them in your Discord server. This bot uses proxies to avoid IP bans and fetches a new guest token periodically to ensure continued access to the Twitter API.
+XCord is a Discord bot that interacts with Twitter. It fetches tweet information and media, and shares them in your Discord server channel.
 
 ## Features
 
