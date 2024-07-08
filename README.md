@@ -1,3 +1,5 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 # XCord
 
 XCord is a Discord bot that interacts with Twitter. It fetches tweet information and media, and shares them in your Discord server channel.
@@ -10,7 +12,7 @@ XCord is a Discord bot that interacts with Twitter. It fetches tweet information
 
 ## Prerequisites
 
-Before you begin, ensure you have met the following requirements:
+If you want to install it for personnal use (fork the project then ask for a pull request if you want to expand some features), ensure you have met the following requirements:
 
 - Node.js installed on your computer.
 - A Discord bot token. You can get one by creating a bot on the [Discord Developer Portal](https://discord.com/developers/applications).
@@ -36,4 +38,10 @@ Before you begin, ensure you have met the following requirements:
 
 5. Invite the bot to your Discord server then send a Twitter URL in any channel and it will fetch and display the tweet medias.
 
-Hosted on [Cybrancee](https://cybrancee.com/).
+## Legal Information
+ 
+[LICENSE](./LICENSE)  
+[TERMS OF SERVICE](./TOS.md)  
+[PRIVACY POLICY](./PRIVACY%20POLICY.md)
+
+Hosted on [Cybrancee](https://cybrancee.com/). 
