@@ -2,7 +2,7 @@
 
 # XCord
 
-XCord is a Discord bot that interacts with Twitter. It fetches tweet information and media, and shares them in your Discord server channel.
+XCord is a Discord bot that interacts with Twitter posts without using its official API which is crap and overpriced.
 
 ## Features
 
