@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits } = require("discord.js");
+const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
 const express = require("express");
 require("dotenv").config();
 const tweetRoute = require("./router.js");
@@ -27,11 +27,20 @@ app.listen(port, () => {
 
 client.once("ready", async () => {
   console.log(`Logged in as ${client.user.tag}`);
+  client.user.setPresence({
+  activities: [{ name: `${client.guilds.cache.size} servers`, type: ActivityType.Watching }]
+});
   await client.application.commands.create({
     name: 'help',
     description: 'Display basic help',
   });
 });
+
+  setInterval(() => {
+    client.user.setPresence({
+  	activities: [{ name: `${client.guilds.cache.size} servers`, type: ActivityType.Watching }]
+	});
+  }, 60000); 
 
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
