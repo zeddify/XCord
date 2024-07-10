@@ -32,7 +32,7 @@ client.once("ready", async () => {
 });
   await client.application.commands.create({
     name: 'help',
-    description: 'Display basic help',
+    description: '❓| Useful info & links',
   });
 });
 
