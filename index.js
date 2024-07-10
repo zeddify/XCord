@@ -42,6 +42,23 @@ client.once("ready", async () => {
 	});
   }, 60000); 
 
+  client.on('guildCreate', async (guild) => {
+    const channel = guild.systemChannel || guild.channels.cache.find(channel => channel.type === 'GUILD_TEXT');
+    if (channel) {
+      try {
+        const fakeInteraction = {
+          commandName: 'help',
+          reply: async (message) => {
+            await channel.send(message);
+          }
+        };
+        helpCommand.execute(fakeInteraction);
+      } catch (error) {
+        console.error("Could not send the help message to the new guild:", error);
+      }
+    }
+  });
+
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
 
