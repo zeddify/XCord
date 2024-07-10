@@ -1,15 +1,16 @@
+const { EmbedBuilder } = require('discord.js');
+
 module.exports = {
-    execute(interaction) {
-      const helpMessage = `
-        # How to use
+  execute(interaction) {
+    const helpEmbed = new EmbedBuilder()
+      .setColor('#0099ff') // CHNAGE TO COLOUR OF YOUR LIKING
+      .setTitle('How to Use')
+      .setDescription('Simply paste a Twitter URL in any channel, and it will fetch and display the tweet information and media.')
+      .addFields(
+        { name: 'Note', value: 'If the bot seems to ignore your messages, it might not have sufficient permissions in the channel. The bot needs both **READ MESSAGE HISTORY** and **SEND MESSAGES** permissions to function correctly.' },
+        { name: 'Support', value: 'If you believe the bot should be working but isn\'t, head to the [support server](https://discord.gg/5YGJvZ2fh3).' }
+      );
 
-Simply paste a Twitter URL in any channel, and it will fetch and display the tweet information and media.  
-
-**Note : ** If the bot seems to ignore your messages, it might not have sufficient permissions in the channel. The bot needs both **READ MESSAGE HISTORY** and **SEND MESSAGES** permissions to function correctly.  
-
-If you believe the bot should be working but isn't, head to the [support server](https://discord.gg/5YGJvZ2fh3).
-      `;
-      interaction.reply(helpMessage);
-    }
-  };
-  
+    interaction.reply({ embeds: [helpEmbed] });
+  }
+};
