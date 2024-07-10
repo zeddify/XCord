@@ -3,7 +3,7 @@ const { EmbedBuilder } = require('discord.js');
 module.exports = {
   execute(interaction) {
     const helpEmbed = new EmbedBuilder()
-      .setColor('#0099ff') // CHNAGE TO COLOUR OF YOUR LIKING
+      .setColor('#000000') 
       .setTitle('How to Use')
       .setDescription('Simply paste a Twitter URL in any channel, and it will fetch and display the tweet information and media.')
       .addFields(
