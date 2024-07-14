@@ -3,23 +3,47 @@ const { convertMp4ToGif } = require("../utils/convertMp4ToGifUtil.js");
 const { PermissionsBitField } = require('discord.js');
 
 const MAX_BITRATE = 2176000;  // bits per second
+const COOLDOWN_DURATION = 5000;  // 5 seconds cooldown per user
+const lastMessageTimestamps = new Map();
 
 async function handleMessage(message) {
   if (message.author.bot) return;
 
+  // check channel permissions
   if (!message.channel.permissionsFor(message.client.user).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory])) {
     console.error('Missing SEND_MESSAGES or READ_MESSAGE_HISTORY permission in this channel.');
     return;
   }
 
   if (message.content.includes("x.com") || message.content.includes("twitter.com")) {
-    console.log("A link has been sent !");
-    const tweetURL = message.content.split(' ').find(url => (url.includes('x.com') && url.includes('/status/')) || (url.includes('twitter.com') && url.includes('/status/')));
-    if (!tweetURL) {
-      console.log("No post found for this link.");
+    console.log("A link has been sent!");
+
+    // clean up the cooldown map
+    const now = Date.now();
+    for (const [key, timestamp] of lastMessageTimestamps.entries()) {
+      if (now - timestamp > COOLDOWN_DURATION) {
+        lastMessageTimestamps.delete(key);
+      }
+    }
+
+    // check for cooldown
+    const lastTimestamp = lastMessageTimestamps.get(message.author.id);
+    if (lastTimestamp && now - lastTimestamp < COOLDOWN_DURATION) {
+      console.log("User on cooldown. Message ignored.")
+      await message.channel.send(`<@${message.author.id}> You are on cooldown (**5 seconds**). Please wait before sending another link if you want the bot to be working.`);
       return;
     }
-    console.log(`Tweet URL : ${tweetURL}`);
+
+    // set the cooldown timestamp
+    lastMessageTimestamps.set(message.author.id, now);
+
+    const tweetURL = message.content.split(' ').find(url => (url.includes('x.com') && url.includes('/status/')) || (url.includes('twitter.com') && url.includes('/status/')));
+    if (!tweetURL) {
+      console.log("No tweet found for this link.");
+      return;
+    }
+
+    console.log(`Tweet URL: ${tweetURL}`);
 
     const tweetID = tweetURL.split('/').pop().split('?')[0];
     try {
@@ -58,7 +82,7 @@ async function handleMessage(message) {
         const quotedTweetText = quotedStatus.result.legacy.full_text;
         if (quotedTweetText) {
           const textWithoutLink = quotedTweetText.split("http")[0].trim();
-          await message.channel.send("**Quoted tweet text : **" + '"' + textWithoutLink + '"');
+          await message.channel.send("**Quoted tweet text:** " + '"' + textWithoutLink + '"');
         }
         const quotedMediaEntities = quotedStatus.result.legacy.extended_entities?.media || [];
         for (const media of quotedMediaEntities) {
@@ -103,12 +127,12 @@ async function handleMessage(message) {
       }
 
       if (allUploadFiles.length > 0) {
-        await message.channel.send({ content: "**Tweet media(s) :**", files: allUploadFiles });
+        await message.channel.send({ content: "**Tweet media(s):**", files: allUploadFiles });
       }
 
     } catch (error) {
       console.error(error);
-      await message.channel.send(`Error extracting media. Might happen when Discord can't preview your tweet, or file may be too large to upload.`);
+      await message.channel.send(`Error extracting media. This might happen if Discord can't preview your tweet or if the file is too large to upload.`);
     }
   }
 }
