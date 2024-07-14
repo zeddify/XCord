@@ -1,5 +1,8 @@
 const { downloadMedia } = require("../utils/downloadMediaUtil.js");
+const { convertMp4ToGif } = require("../utils/convertMp4ToGifUtil.js");
 const { PermissionsBitField } = require('discord.js');
+
+const MAX_BITRATE = 2176000;  // bits per second
 
 async function handleMessage(message) {
   if (message.author.bot) return;
@@ -23,6 +26,7 @@ async function handleMessage(message) {
       const response = await fetch(`http://localhost:3000/${tweetID}`);
       const tweetData = await response.json();
       const mediaUrls = [];
+      const gifUrls = [];
       const mediaEntities = tweetData.data.tweetResult.result.legacy.extended_entities?.media || [];
 
       for (const media of mediaEntities) {
@@ -30,10 +34,22 @@ async function handleMessage(message) {
           mediaUrls.push(media.media_url_https);
         } else if (media.type === "video" || media.type === "animated_gif") {
           const variants = media.video_info.variants;
-          const highestBitrateVariant = variants.reduce((prev, current) => {
-            return prev.bitrate > current.bitrate ? prev : current;
-          });
-          mediaUrls.push(highestBitrateVariant.url.slice(0, -7));
+          const suitableVariants = variants.filter(variant => variant.bitrate <= MAX_BITRATE);
+          if (suitableVariants.length > 0) {
+            const highestBitrateVariant = suitableVariants.reduce((prev, current) => {
+              return prev.bitrate > current.bitrate ? prev : current;
+            });
+            const mediaUrl = highestBitrateVariant.url;
+            if (media.type === "animated_gif") {
+              gifUrls.push(mediaUrl);  
+            } else if (mediaUrl.endsWith(".mp4")) {
+              mediaUrls.push(mediaUrl);
+            } else {
+              mediaUrls.push(mediaUrl.slice(0, -7));  
+            }
+          } else {
+            console.log("No suitable video variant found within the bitrate limit.");
+          }
         }
       }
 
@@ -50,23 +66,49 @@ async function handleMessage(message) {
             mediaUrls.push(media.media_url_https);
           } else if (media.type === "video" || media.type === "animated_gif") {
             const variants = media.video_info.variants;
-            const highestBitrateVariant = variants.reduce((prev, current) => {
-              return prev.bitrate > current.bitrate ? prev : current;
-            });
-            mediaUrls.push(highestBitrateVariant.url.slice(0, -7));
+            const suitableVariants = variants.filter(variant => variant.bitrate <= MAX_BITRATE);
+            if (suitableVariants.length > 0) {
+              const highestBitrateVariant = suitableVariants.reduce((prev, current) => {
+                return prev.bitrate > current.bitrate ? prev : current;
+              });
+              const mediaUrl = highestBitrateVariant.url;
+              if (media.type === "animated_gif") {
+                gifUrls.push(mediaUrl);  
+              } else if (mediaUrl.endsWith(".mp4")) {
+                mediaUrls.push(mediaUrl);
+              } else {
+                mediaUrls.push(mediaUrl.slice(0, -7));  
+              }
+            } else {
+              console.log("No suitable quoted video variant found within the bitrate limit.");
+            }
           }
         }
       }
 
+      const allUploadFiles = [];
+
       if (mediaUrls.length > 0) {
         const uploadFiles = await downloadMedia(mediaUrls);
         if (uploadFiles.length > 0) {
-          await message.channel.send({ content: "**Tweet media(s) :**", files: uploadFiles });
+          allUploadFiles.push(...uploadFiles);
         }
       }
+
+      if (gifUrls.length > 0) {
+        const gifFiles = await convertMp4ToGif(gifUrls);
+        if (gifFiles.length > 0) {
+          allUploadFiles.push(...gifFiles);
+        }
+      }
+
+      if (allUploadFiles.length > 0) {
+        await message.channel.send({ content: "**Tweet media(s) :**", files: allUploadFiles });
+      }
+
     } catch (error) {
       console.error(error);
-      await message.channel.send(`Error extracting media. Might happen when Discord can't preview your tweet too.`);
+      await message.channel.send(`Error extracting media. Might happen when Discord can't preview your tweet, or file may be too large to upload.`);
     }
   }
 }
