@@ -9,7 +9,7 @@ const lastMessageTimestamps = new Map();
 async function handleMessage(message) {
   if (message.author.bot) return;
 
-  // check channel permissions
+  // check bot permissions
   if (!message.channel.permissionsFor(message.client.user).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory])) {
     console.error('Missing SEND_MESSAGES or READ_MESSAGE_HISTORY permission in this channel.');
     return;
@@ -29,8 +29,9 @@ async function handleMessage(message) {
     // check for cooldown
     const lastTimestamp = lastMessageTimestamps.get(message.author.id);
     if (lastTimestamp && now - lastTimestamp < COOLDOWN_DURATION) {
+      const remainingTime = ((COOLDOWN_DURATION - (now - lastTimestamp)) / 1000).toFixed(1);
       console.log("User on cooldown. Message ignored.")
-      await message.channel.send(`<@${message.author.id}> You are on cooldown (**5 seconds**). Please wait before sending another link if you want the bot to be working.`);
+      await message.channel.send(`<@${message.author.id}> You are on cooldown (${remainingTime} seconds remaining). Please wait before sending another link if you want the bot to be working.`);
       return;
     }
 
