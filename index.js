@@ -46,6 +46,7 @@ client.once("ready", async () => {
   });
 });
 
+// when joining a new discord
 client.on(Events.GuildCreate, async (guild) => {
   const channel =
     guild.systemChannel ||
@@ -62,15 +63,16 @@ client.on(Events.GuildCreate, async (guild) => {
   const owner = await guild.fetchOwner();
   const embed = new EmbedBuilder()
     .setTitle(`Hello ${owner.user.username}!`)
-    .setDescription(
-      `Thanks for inviting me to your server **${guild.name}**! Consider using **/help** first and foremost.`
-    )
+    .setDescription(`Thanks for inviting me to your server **${guild.name}**!`)
+  	.addFields(
+    	{name :'Note', value :"Consider using **/help** if I don't react to your messages."})
     .setColor("#000000")
     .setTimestamp();
   await owner.send({ embeds: [embed] });
-  console.log(`Embed sent to owner ${owner.user.tag} of server ${guild.name}`);
+  console.log(`Message sent to owner ${owner.user.tag} of server ${guild.name}`);
 });
 
+// refresh activity status every minute
 setInterval(() => {
   client.user.setPresence({
     activities: [
@@ -82,6 +84,8 @@ setInterval(() => {
   });
 }, 60000);
 
+
+// react to /help command
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
 
@@ -90,6 +94,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
+// react to twitter urls
 client.on("messageCreate", handleMessage);
 
 client.login(process.env.DISCORD_TOKEN);

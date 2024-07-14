@@ -10,17 +10,20 @@ async function handleMessage(message) {
   }
 
   if (message.content.includes("x.com") || message.content.includes("twitter.com")) {
-    console.log("A tweet has been sent !");
-    const tweetURL = message.content.split(' ').find(url => url.includes('x.com') || url.includes('twitter.com'));
-    if (!tweetURL) return;
+    console.log("A link has been sent !");
+    const tweetURL = message.content.split(' ').find(url => (url.includes('x.com') && url.includes('/status/')) || (url.includes('twitter.com') && url.includes('/status/')));
+    if (!tweetURL) {
+      console.log("No post found for this link.");
+      return;
+    }
+    console.log(`Tweet URL : ${tweetURL}`);
 
     const tweetID = tweetURL.split('/').pop().split('?')[0];
     try {
       const response = await fetch(`http://localhost:3000/${tweetID}`);
       const tweetData = await response.json();
       const mediaUrls = [];
-      const mediaEntities =
-        tweetData.data.tweetResult.result.legacy.extended_entities?.media || [];
+      const mediaEntities = tweetData.data.tweetResult.result.legacy.extended_entities?.media || [];
 
       for (const media of mediaEntities) {
         if (media.type === "photo") {
@@ -41,8 +44,7 @@ async function handleMessage(message) {
           const textWithoutLink = quotedTweetText.split("http")[0].trim();
           await message.channel.send("**Quoted tweet text : **" + '"' + textWithoutLink + '"');
         }
-        const quotedMediaEntities =
-          quotedStatus.result.legacy.extended_entities?.media || [];
+        const quotedMediaEntities = quotedStatus.result.legacy.extended_entities?.media || [];
         for (const media of quotedMediaEntities) {
           if (media.type === "photo") {
             mediaUrls.push(media.media_url_https);
@@ -64,7 +66,7 @@ async function handleMessage(message) {
       }
     } catch (error) {
       console.error(error);
-      await message.channel.send(`Error extracting media.`);
+      await message.channel.send(`Error extracting media. Might happen when Discord can't preview your tweet too.`);
     }
   }
 }
