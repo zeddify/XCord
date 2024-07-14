@@ -6,9 +6,8 @@ XCord is a Discord bot that interacts with Twitter posts without using its offic
 
 ## Features
 
-- Fetches and displays tweet information from a given Twitter URL.
-- Downloads and shares tweet media (photos, videos, GIFs) in the Discord channel.
-- Automatically handles quoted tweets and shares their media as well.
+- Downloads and shares medias from a given Twitter URL (photos, videos, GIFs) in the Discord channel.
+- Automatically handles quoted tweets and shares their medias as well.
 
 ## Prerequisites
 
