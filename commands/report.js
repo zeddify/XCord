@@ -16,8 +16,7 @@ module.exports = {
       )
       .setTimestamp();
 
-    // Assuming you have a channel ID for reports
-    const reportChannelId = '1262469793152241684'; // replace with your channel ID
+    const reportChannelId = '1262469793152241684';
     const reportChannel = interaction.client.channels.cache.get(reportChannelId);
 
     if (reportChannel) {
