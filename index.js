@@ -10,6 +10,7 @@ const tweetRoute = require("./router.js");
 const handleMessage = require("./events/messageEvent");
 const handleOnJoin = require("./events/onJoinEvent");
 const helpCommand = require("./commands/help");
+const pingCommand = require("./commands/ping");
 
 // Discord bot intents
 const client = new Client({
@@ -30,6 +31,7 @@ app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
 
+// on ready + setting up the available commands
 client.once("ready", async () => {
   console.log(`Logged in as ${client.user.tag}`);
   client.user.setPresence({
@@ -40,9 +42,15 @@ client.once("ready", async () => {
       },
     ],
   });
+  
   await client.application.commands.create({
     name: "help",
     description: '❓| Useful info & links',
+  });
+
+  await client.application.commands.create({
+    name: "ping",
+    description: '🏓| Check the bot\'s status',
   });
 });
 
@@ -61,13 +69,14 @@ setInterval(() => {
   });
 }, 60000);
 
-
-// react to /help command
+// react to /help and /ping commands
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
 
   if (interaction.commandName === "help") {
     helpCommand.execute(interaction);
+  } else if (interaction.commandName === "ping") {
+    pingCommand.execute(interaction);
   }
 });
 

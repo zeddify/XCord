@@ -5,8 +5,7 @@ module.exports = {
     const pingEmbed = new EmbedBuilder()
       .setColor('#000000')
       .setTitle('XCord')
-      .setDescription(`**Latency:** ${Date.now() - interaction.createdTimestamp}ms\n**API:** ${Math.round(interaction.client.ws.ping)}ms`)
-
+      .setDescription(`**Latency:** ${Date.now() - interaction.createdTimestamp}ms`)
     interaction.reply({ embeds: [pingEmbed] });
   }
 };
