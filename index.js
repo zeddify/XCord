@@ -10,6 +10,7 @@ require("dotenv").config();
 const tweetRoute = require("./router.js");
 const handleMessage = require("./events/messageEvent");
 const helpCommand = require("./commands/help");
+const pingCommand = require("./commands/ping")
 
 // Discord bot intents
 const client = new Client({
@@ -42,8 +43,13 @@ client.once("ready", async () => {
   });
   await client.application.commands.create({
     name: "help",
-    description: '❓| Useful info & links',
+    description: '❓ | Useful info & links',
   });
+});
+
+await client.application.commands.create({
+  name: "ping",
+  description: '💓 | Check how XCord is doing!',
 });
 
 // when joining a new discord
@@ -85,12 +91,14 @@ setInterval(() => {
 }, 60000);
 
 
-// react to /help command
+// react to /help and /ping commands
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
 
   if (interaction.commandName === "help") {
     helpCommand.execute(interaction);
+  } else if (interaction.commandName === "ping") {
+    pingCommand.execute(interaction);
   }
 });
 
