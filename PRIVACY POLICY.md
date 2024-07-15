@@ -2,7 +2,7 @@
 ## This is the privacy policy for the XCord Discord bot / website.
 Your privacy is important to us. It is XCord's policy to respect your privacy and comply with any applicable law and regulation regarding any personal information we may collect about you, including across our Discord server https://discord.gg/5YGJvZ2fh3.
 
-This policy is effective as of 7 July 2024 and was last updated on 7 July 2024.
+This policy is effective as of 7 July 2024 and was last updated on 15 July 2024.
 
 ## Information We Collect
 ### Discord Bot
