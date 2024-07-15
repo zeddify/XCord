@@ -6,7 +6,7 @@ This policy is effective as of 7 July 2024 and was last updated on 7 July 2024.
 
 ## Information We Collect
 ### Discord Bot
-Our discord bot does not collect any personally identifing information along with the medias that are downoaded. Messages sent in servers are monitored, but no logs of messages are kept and we will never keep any logs of this type.
+Our discord bot does not collect any personally identifing information along with the medias that are downloaded. Messages sent in servers are monitored, but no logs of messages are kept and we will never keep any logs of this type.
 
 ## Children's Privacy
 We do not aim any of our products or services directly at children under the age of 13, and we do not knowingly collect personal information about children under 13.
