@@ -11,7 +11,7 @@ async function handleMessage(message) {
 
   // check bot permissions
   if (!message.channel.permissionsFor(message.client.user).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory, PermissionsBitField.Flags.AttachFiles,])) {
-    console.error('Missing SEND_MESSAGES or READ_MESSAGE_HISTORY permission in this channel.');
+    console.error('Missing SEND_MESSAGES, READ_MESSAGE_HISTORY OR ATTACH_FILES permission in this channel.');
     return;
   }
 

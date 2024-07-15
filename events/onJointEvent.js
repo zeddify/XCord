@@ -1,18 +1,22 @@
-const { EmbedBuilder } = require('discord.js');
+const { Events, EmbedBuilder, PermissionsBitField } = require('discord.js');
 const helpCommand = require('../commands/help');
 
 async function handleOnJoin(guild) {
   const channel = guild.systemChannel ||
     guild.channels.cache.find((channel) => channel.type === "GUILD_TEXT");
-  
+
   if (channel) {
-    const fakeInteraction = {
-      commandName: "help",
-      reply: async (message) => {
-        await channel.send(message);
-      },
-    };
-    helpCommand.execute(fakeInteraction);
+    if (channel.permissionsFor(guild.me).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory])) {
+      const fakeInteraction = {
+        commandName: "help",
+        reply: async (message) => {
+          await channel.send(message);
+        },
+      };
+      helpCommand.execute(fakeInteraction);
+    } else {
+      console.error('Missing SEND_MESSAGES or READ_MESSAGE_HISTORY permission in the system channel.');
+    }
   }
 
   const owner = await guild.fetchOwner();
