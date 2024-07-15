@@ -10,7 +10,7 @@ async function handleMessage(message) {
   if (message.author.bot) return;
 
   // check bot permissions
-  if (!message.channel.permissionsFor(message.client.user).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory])) {
+  if (!message.channel.permissionsFor(message.client.user).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory, PermissionsBitField.Flags.AttachFiles,])) {
     console.error('Missing SEND_MESSAGES or READ_MESSAGE_HISTORY permission in this channel.');
     return;
   }
@@ -37,7 +37,10 @@ async function handleMessage(message) {
 
     // set the cooldown timestamp
     lastMessageTimestamps.set(message.author.id, now);
-
+   	
+    // indicate that the bot is processing the request
+    message.channel.sendTyping();
+      
     const tweetURL = message.content.split(' ').find(url => (url.includes('x.com') && url.includes('/status/')) || (url.includes('twitter.com') && url.includes('/status/')));
     if (!tweetURL) {
       console.log("No tweet found for this link.");

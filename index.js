@@ -2,13 +2,13 @@ const {
   Client,
   GatewayIntentBits,
   ActivityType,
-  Events,
-  EmbedBuilder,
+  Events
 } = require("discord.js");
 const express = require("express");
 require("dotenv").config();
 const tweetRoute = require("./router.js");
 const handleMessage = require("./events/messageEvent");
+const handleOnJoin = require("./events/onJoinEvent");
 const helpCommand = require("./commands/help");
 
 // Discord bot intents
@@ -47,32 +47,9 @@ client.once("ready", async () => {
 });
 
 // when joining a new discord
-client.on(Events.GuildCreate, async (guild) => {
-  const channel =
-    guild.systemChannel ||
-    guild.channels.cache.find((channel) => channel.type === "GUILD_TEXT");
-  if (channel) {
-    const fakeInteraction = {
-      commandName: "help",
-      reply: async (message) => {
-        await channel.send(message);
-      },
-    };
-    helpCommand.execute(fakeInteraction);
-  }
-  const owner = await guild.fetchOwner();
-  const embed = new EmbedBuilder()
-    .setTitle(`Hello ${owner.user.username}!`)
-    .setDescription(`Thanks for inviting me to your server **${guild.name}**!`)
-  	.addFields(
-    	{name :'Note', value :"Consider using **/help** if I don't react to your messages."})
-    .setColor("#000000")
-    .setTimestamp();
-  await owner.send({ embeds: [embed] });
-  console.log(`Message sent to owner ${owner.user.tag} of server ${guild.name}`);
-});
+client.on(Events.GuildCreate, handleOnJoin);
 
-// refresh activity status every minute
+// refresh activity status
 setInterval(() => {
   client.user.setPresence({
     activities: [

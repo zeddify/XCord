@@ -1,6 +1,7 @@
 const ffmpeg = require('fluent-ffmpeg');
 const fs = require("fs");
 const tmp = require("tmp");
+const { AttachmentBuilder } = require("discord.js");
 
 async function convertMp4ToGif(mp4Urls) {
     const gifFiles = [];
