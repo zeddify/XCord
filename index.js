@@ -4,6 +4,7 @@ const {
   ActivityType,
   Events,
   EmbedBuilder,
+  ChannelType
 } = require("discord.js");
 const express = require("express");
 require("dotenv").config();
@@ -56,7 +57,7 @@ await client.application.commands.create({
 client.on(Events.GuildCreate, async (guild) => {
   const channel =
     guild.systemChannel ||
-    guild.channels.cache.find((channel) => channel.type === "GUILD_TEXT");
+    guild.channels.cache.find((channel) => channel.type === ChannelType.GuildText);
   if (channel) {
     const fakeInteraction = {
       commandName: "help",
