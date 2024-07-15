@@ -32,7 +32,7 @@ app.listen(port, () => {
 });
 
 client.once("ready", async () => {
-  console.log(`Logged in as ${client.user.tag}`);
+  console.log(`Logged in as: ${client.user.tag}`);
   client.user.setPresence({
     activities: [
       {
