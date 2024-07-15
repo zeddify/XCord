@@ -1,17 +1,11 @@
-const {
-  Client,
-  GatewayIntentBits,
-  ActivityType,
-  Events,
-  EmbedBuilder,
-  ChannelType
-} = require("discord.js");
+const {Client, GatewayIntentBits, ActivityType, Events, EmbedBuilder, ChannelType} = require("discord.js");
 const express = require("express");
 require("dotenv").config();
 const tweetRoute = require("./router.js");
 const handleMessage = require("./events/messageEvent");
 const helpCommand = require("./commands/help");
 const pingCommand = require("./commands/ping")
+const reportCommand = require("./commands/report")
 
 // Discord bot intents
 const client = new Client({
@@ -42,15 +36,20 @@ client.once("ready", async () => {
       },
     ],
   });
-  await client.application.commands.create({
-    name: "help",
-    description: '❓ | Useful info & links',
-  });
+  
+await client.application.commands.create({
+  name: "help",
+  description: '❓| Useful info & links',
 });
 
 await client.application.commands.create({
   name: "ping",
-  description: '💓 | Check how XCord is doing!',
+  description: '🏓| Check the bot\'s status',
+});
+
+await client.application.commands.create({
+  name: "report",
+  description: '📢| Report an issue or a user',
 });
 
 // when joining a new discord
