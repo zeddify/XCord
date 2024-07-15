@@ -50,7 +50,22 @@ await client.application.commands.create({
 await client.application.commands.create({
   name: "report",
   description: '📢| Report an issue or a user',
+  options: [
+    {
+      name: 'user',
+      type: 'USER',
+      description: 'The user you want to report',
+      required: false,
+    },
+    {
+      name: 'issue',
+      type: 'STRING',
+      description: 'Describe the issue',
+      required: true,
+    },
+  ],
 });
+
 
 // when joining a new discord
 client.on(Events.GuildCreate, async (guild) => {
