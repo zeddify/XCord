@@ -4,14 +4,15 @@ const { PermissionsBitField } = require('discord.js');
 
 const MAX_BITRATE = 2176000;  // bits per second
 const COOLDOWN_DURATION = 5000;  // 5 seconds cooldown per user
-const lastMessageTimestamps = new Map();
+const lastMessageTtimestamps = new Map();
 
 async function handleMessage(message) {
   if (message.author.bot) return;
 
   // check bot permissions
-  if (!message.channel.permissionsFor(message.client.user).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory, PermissionsBitField.Flags.AttachFiles,])) {
-    console.error('Missing SEND_MESSAGES, READ_MESSAGE_HISTORY OR ATTACH_FILES permission in this channel.');
+  const botPermissions = message.channel.permissionsFor(message.guild?.members.me);
+  if (!botPermissions.has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory, PermissionsBitField.Flags.AttachFiles, PermissionsBitField.Flags.EmbedLinks])) {
+    console.error('Missing SEND_MESSAGES, READ_MESSAGE_HISTORY, ATTACH_FILES OR EMBED_LINKS permission in this channel.');
     return;
   }
 
@@ -20,27 +21,24 @@ async function handleMessage(message) {
 
     // clean up the cooldown map
     const now = Date.now();
-    for (const [key, timestamp] of lastMessageTimestamps.entries()) {
+    for (const [key, timestamp] of lastMessageTtimestamps.entries()) {
       if (now - timestamp > COOLDOWN_DURATION) {
-        lastMessageTimestamps.delete(key);
+        lastMessageTtimestamps.delete(key);
       }
     }
 
     // check for cooldown
-    const lastTimestamp = lastMessageTimestamps.get(message.author.id);
+    const lastTimestamp = lastMessageTtimestamps.get(message.author.id);
     if (lastTimestamp && now - lastTimestamp < COOLDOWN_DURATION) {
       const remainingTime = ((COOLDOWN_DURATION - (now - lastTimestamp)) / 1000).toFixed(1);
-      console.log("User on cooldown. Message ignored.")
-      await message.channel.send(`<@${message.author.id}> You are on cooldown (${remainingTime} seconds remaining). Please wait before sending another link if you want the bot to be working.`);
+      console.log("User on cooldown. Message ignored.");
+      await message.reply(`You are on cooldown (${remainingTime} seconds remaining). Please wait before sending another link if you want the bot to be working.`);
       return;
     }
 
     // set the cooldown timestamp
-    lastMessageTimestamps.set(message.author.id, now);
-   	
-    // indicate that the bot is processing the request
-    message.channel.sendTyping();
-      
+    lastMessageTtimestamps.set(message.author.id, now);
+
     const tweetURL = message.content.split(' ').find(url => (url.includes('x.com') && url.includes('/status/')) || (url.includes('twitter.com') && url.includes('/status/')));
     if (!tweetURL) {
       console.log("No tweet found for this link.");
@@ -56,6 +54,11 @@ async function handleMessage(message) {
       const mediaUrls = [];
       const gifUrls = [];
       const mediaEntities = tweetData.data.tweetResult.result.legacy.extended_entities?.media || [];
+      const quotedStatus = tweetData.data.tweetResult.result.quoted_status_result;
+
+      if (mediaEntities.length > 0 || quotedStatus) {
+        message.channel.sendTyping();
+      }
 
       for (const media of mediaEntities) {
         if (media.type === "photo") {
@@ -69,11 +72,11 @@ async function handleMessage(message) {
             });
             const mediaUrl = highestBitrateVariant.url;
             if (media.type === "animated_gif") {
-              gifUrls.push(mediaUrl);  
+              gifUrls.push(mediaUrl);
             } else if (mediaUrl.endsWith(".mp4")) {
               mediaUrls.push(mediaUrl);
             } else {
-              mediaUrls.push(mediaUrl.slice(0, -7));  
+              mediaUrls.push(mediaUrl.slice(0, -7));
             }
           } else {
             console.log("No suitable video variant found within the bitrate limit.");
@@ -81,12 +84,12 @@ async function handleMessage(message) {
         }
       }
 
-      const quotedStatus = tweetData.data.tweetResult.result.quoted_status_result;
+      let quotedTweetText;
+      let textWithoutLink;
       if (quotedStatus) {
-        const quotedTweetText = quotedStatus.result.legacy.full_text;
+        quotedTweetText = quotedStatus.result.legacy.full_text;
         if (quotedTweetText) {
-          const textWithoutLink = quotedTweetText.split("http")[0].trim();
-          await message.channel.send("**Quoted tweet text:** " + '"' + textWithoutLink + '"');
+          textWithoutLink = quotedTweetText.split("http")[0].trim();
         }
         const quotedMediaEntities = quotedStatus.result.legacy.extended_entities?.media || [];
         for (const media of quotedMediaEntities) {
@@ -101,11 +104,11 @@ async function handleMessage(message) {
               });
               const mediaUrl = highestBitrateVariant.url;
               if (media.type === "animated_gif") {
-                gifUrls.push(mediaUrl);  
+                gifUrls.push(mediaUrl);
               } else if (mediaUrl.endsWith(".mp4")) {
                 mediaUrls.push(mediaUrl);
               } else {
-                mediaUrls.push(mediaUrl.slice(0, -7));  
+                mediaUrls.push(mediaUrl.slice(0, -7));
               }
             } else {
               console.log("No suitable quoted video variant found within the bitrate limit.");
@@ -115,11 +118,15 @@ async function handleMessage(message) {
       }
 
       const allUploadFiles = [];
+      const oversizedMediaUrls = [];
 
       if (mediaUrls.length > 0) {
-        const uploadFiles = await downloadMedia(mediaUrls);
+        const { uploadFiles, oversizedMediaUrls: oversized } = await downloadMedia(mediaUrls);
         if (uploadFiles.length > 0) {
           allUploadFiles.push(...uploadFiles);
+        }
+        if (oversized.length > 0) {
+          oversizedMediaUrls.push(...oversized);
         }
       }
 
@@ -130,13 +137,40 @@ async function handleMessage(message) {
         }
       }
 
-      if (allUploadFiles.length > 0) {
-        await message.channel.send({ content: "**Tweet media(s):**", files: allUploadFiles });
+      if (allUploadFiles.length === 0 && oversizedMediaUrls.length === 0) {
+        if (textWithoutLink) {
+          await message.reply({ content: `**• Quoted tweet text:** "${textWithoutLink}"` });
+        }
+      }
+
+      if (allUploadFiles.length > 0 || oversizedMediaUrls.length > 0) {
+        let content = "";
+
+        if (textWithoutLink) {
+          content += `**• Quoted tweet text:** "${textWithoutLink}"\n`;
+        }
+
+        if (allUploadFiles.length > 0 && oversizedMediaUrls.length > 0) {
+          content += `• **Tweet media(s):**\n${oversizedMediaUrls.join('\n')}`;
+          await message.reply({ content, files: allUploadFiles });
+          return;
+        }
+
+        if (allUploadFiles.length > 0) {
+          content += "• **Tweet media(s):**";
+          await message.reply({ content, files: allUploadFiles });
+          return;
+        }
+
+        if (oversizedMediaUrls.length > 0) {
+          content += `• **Tweet media(s):**\n${oversizedMediaUrls.join('\n')}`;
+          await message.reply({ content });
+        }
       }
 
     } catch (error) {
       console.error(error);
-      await message.channel.send(`Error extracting media. This might happen if Discord can't preview your tweet or if the file is too large to upload.`);
+      await message.reply(`Error extracting media. This might happen for NSFW tweets.`);
     }
   }
 }
