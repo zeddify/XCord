@@ -103,7 +103,7 @@ setInterval(() => {
       },
     ],
   });
-}, 60000);
+}, 3000);
 
 // react to /help and /ping commands
 client.on("interactionCreate", async (interaction) => {
