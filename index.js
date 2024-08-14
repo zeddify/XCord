@@ -5,7 +5,6 @@ const tweetRoute = require("./router.js");
 const handleMessage = require("./events/messageEvent");
 const helpCommand = require("./commands/help");
 const pingCommand = require("./commands/ping")
-const reportCommand = require("./commands/report")
 
 // Discord bot intents
 const client = new Client({
@@ -46,26 +45,6 @@ await client.application.commands.create({
   name: "ping",
   description: '🏓| Check the bot\'s status',
 });
-
-await client.application.commands.create({
-  name: "report",
-  description: '📢| Report an issue or a user',
-  options: [
-    {
-      name: 'user',
-      type: 'USER',
-      description: 'The user you want to report',
-      required: false,
-    },
-    {
-      name: 'issue',
-      type: 'STRING',
-      description: 'Describe the issue',
-      required: true,
-    },
-  ],
-});
-
 
 // when joining a new discord
 client.on(Events.GuildCreate, async (guild) => {
@@ -117,6 +96,5 @@ client.on("interactionCreate", async (interaction) => {
 });
 
 // react to twitter urls
-client.on("messageCreate", handleMessage);
-
+client.on("messageCreate", handleMessage)});
 client.login(process.env.DISCORD_TOKEN);
